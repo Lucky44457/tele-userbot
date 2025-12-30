@@ -18,4 +18,4 @@ RUN pip install --no-cache-dir -U pip wheel \
 
 COPY . .
 
-CMD ["python","main.py"]
+CMD python health.py & python main.py
