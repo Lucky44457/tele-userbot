@@ -7,7 +7,7 @@ from pyrogram.types import Message
 
 API_ID = int(os.getenv("API_ID"))
 API_HASH = os.getenv("API_HASH")
-STRING_SESSION = os.getenv("SESSION_STRING")
+STRING_SESSION = os.getenv("STRING_SESSION")
 
 # Log group (forum-enabled supergroup)
 LOG_GROUP_ID = int(os.getenv("LOG_GROUP_ID"))
@@ -18,7 +18,7 @@ app = Client(
     "userbot",
     api_id=API_ID,
     api_hash=API_HASH,
-    session_string=SESSION_STRING
+    session_string=STRING_SESSION
 )
 
 # ================= MEMORY =================
