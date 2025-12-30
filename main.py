@@ -3,14 +3,15 @@ import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-# ================= CONFIG =================
+# ================= ENV =================
 
 API_ID = int(os.getenv("API_ID"))
 API_HASH = os.getenv("API_HASH")
 STRING_SESSION = os.getenv("STRING_SESSION")
-
-# Log group (forum-enabled supergroup)
 LOG_GROUP_ID = int(os.getenv("LOG_GROUP_ID"))
+
+if not STRING_SESSION:
+    raise RuntimeError("STRING_SESSION is missing")
 
 # ================= USERBOT =================
 
@@ -25,28 +26,26 @@ app = Client(
 # user_id -> message_thread_id
 USER_TOPICS = {}
 
-# ================= FUNCTIONS =================
+# ================= TOPIC FUNCTION =================
+# 🔥 YE WAHI FUNCTION HAI JO TUMNE POOCHA
 
-async def get_or_create_topic(client: Client, user):
+async def get_or_create_topic(client, user):
     uid = user.id
 
-    # Reuse existing topic (runtime)
     if uid in USER_TOPICS:
         return USER_TOPICS[uid]
-
-    title = f"{user.first_name or 'User'} | {uid}"
 
     try:
         topic = await client.create_forum_topic(
             chat_id=LOG_GROUP_ID,
-            title=title
+            title=f"{user.first_name or 'User'} | {uid}"
         )
         USER_TOPICS[uid] = topic.message_thread_id
-        print(f"✅ Topic created for {uid}: {topic.message_thread_id}")
+        print(f"✅ Topic created for {uid}")
         return topic.message_thread_id
 
     except Exception as e:
-        print(f"❌ Topic creation failed for {uid}: {e}")
+        print(f"❌ Topic creation failed: {e}")
         return None
 
 # ================= HANDLER =================
@@ -59,6 +58,11 @@ async def log_private_messages(client: Client, message: Message):
     user = message.from_user
     topic_id = await get_or_create_topic(client, user)
 
+    # ❌ AGAR TOPIC NA BANE TO GENERAL ME MAT BHEJO
+    if not topic_id:
+        print("❌ No topic id, message skipped")
+        return
+
     text = (
         f"👤 User: {user.mention}\n"
         f"🆔 ID: `{user.id}`\n\n"
@@ -69,18 +73,11 @@ async def log_private_messages(client: Client, message: Message):
     else:
         text += "📎 Media received"
 
-    if topic_id:
-        await client.send_message(
-            chat_id=LOG_GROUP_ID,
-            message_thread_id=topic_id,
-            text=text
-        )
-    else:
-        # fallback (should not happen)
-        await client.send_message(
-            chat_id=LOG_GROUP_ID,
-            text="❌ Topic create failed\n\n" + text
-        )
+    await client.send_message(
+        chat_id=LOG_GROUP_ID,
+        message_thread_id=topic_id,
+        text=text
+    )
 
 # ================= START =================
 
