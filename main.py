@@ -15,10 +15,10 @@ LOG_GROUP_ID = int(os.getenv("LOG_GROUP_ID"))
 # ================= USERBOT =================
 
 app = Client(
-    session_name=STRING_SESSION,
+    "userbot",
     api_id=API_ID,
     api_hash=API_HASH,
-    in_memory=True
+    session_string=STRING_SESSION
 )
 
 # ================= MEMORY =================
